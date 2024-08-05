@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Button Example</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            background-color: transparent; /* Transparent background for the body */
+            color: #e3e3e3; /* Text colour */
+            text-align: center; /* Centre-align the content */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+
+        .like-container {
+            font-family: 'Courier New', monospace;
+            display: flex; /* Use flexbox for horizontal layout */
+            align-items: center; /* Vertically centre the items */
+            justify-content: center; /* Horizontally centre the items */
+            gap: 2vw; /* Space between the button and the count */
+            margin-top: 2vw; /* Space above the container */
+        }
+
+        .like-button {
+            font-family: 'Courier New', monospace;
+            font-size: 1em; /* Base font size to be adjusted by JavaScript */
+            color: #6e6e6e; /* Text colour */
+            background-color: transparent; /* Transparent background */
+            border: 0.2vw solid #6e6e6e; /* Border for visibility */
+            padding: 1vw 2vw;
+            cursor: pointer;
+            border-radius: 0.5vw;
+            outline: none;
+        }
+
+        .like-button:hover {
+            background-color: #c4c4c4; /* Slightly visible background on hover */
+        }
+
+        .like-count {
+            font-family: 'Courier New', monospace;
+            font-size: 1em; /* Base font size to be adjusted by JavaScript */
+            color: #6e6e6e; /* Text colour */
+            background-color: transparent; /* Transparent background */
+            border: none; /* Remove border */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="like-container" id="likeContainer">
+        <button class="like-button" id="likeButton">Like</button>
+        <div class="like-count" id="likeCount">0</div>
+    </div>
+
+    <script>
+        // Function to get the user's IP address
+        function getUserIP(callback) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://api.ipify.org?format=json', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const ip = JSON.parse(xhr.responseText).ip;
+                    callback(ip);
+                }
+            };
+            xhr.send();
+        }
+
+        // Retrieve the current like count from localStorage
+        let likeCount = parseInt(localStorage.getItem('likeCount')) || 0;
+
+        // Display the like count
+        document.getElementById('likeCount').textContent = likeCount;
+
+        // Add event listener to the like button
+        document.getElementById('likeButton').addEventListener('click', function() {
+            getUserIP(function(ip) {
+                // Check if the user's IP address is already stored
+                const likedIPs = JSON.parse(localStorage.getItem('likedIPs')) || [];
+                if (!likedIPs.includes(ip)) {
+                    likeCount++;
+                    // Update localStorage with the new like count
+                    localStorage.setItem('likeCount', likeCount);
+                    // Update the displayed like count
+                    document.getElementById('likeCount').textContent = likeCount;
+                    // Store the user's IP address in localStorage
+                    likedIPs.push(ip);
+                    localStorage.setItem('likedIPs', JSON.stringify(likedIPs));
+                } else {
+                    alert('You have already liked this.');
+                }
+            });
+        });
+
+        // Function to adjust font size based on container size
+        function adjustFontSize() {
+            const container = document.getElementById('likeContainer');
+            const fontSize = container.offsetWidth * 0.15; // Adjust this multiplier as needed for larger font
+            container.style.fontSize = fontSize + 'px';
+        }
+
+        // Adjust font size on load and on resize
+        window.addEventListener('load', adjustFontSize);
+        window.addEventListener('resize', adjustFontSize);
+    </script>
+</body>
+
+</html>
